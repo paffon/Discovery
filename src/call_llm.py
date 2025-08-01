@@ -45,13 +45,37 @@ def call_llm(messages: List[Dict[Literal["system", "user", "assistant"], str]]) 
 
 
 if __name__ == "__main__":
-    # Example usage
-    example_messages = [
-        {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "What is the capital of France?"}
-    ]
     
-    example_messages.append({"role": "assistant", "content": call_llm(example_messages)})
+    def print_messages_with_roles(messages) -> None:
+        """Print messages with their roles."""
+        for msg in messages:
+            print(f"{msg['role'].ljust(9)}: {msg['content']}")
     
-    for msg in example_messages:
-        print(f"{msg['role'].ljust(9)}: {msg['content']}")
+    def send_and_print(messages) -> None:
+        print('\n----\n')
+
+        """Send messages to the LLM and print the response."""
+        response = call_llm(messages)
+        messages.append({"role": "assistant", "content": response})
+        print_messages_with_roles(messages)
+    
+    # Roles can be: 'system', 'assistant', 'user', 'function', 'tool', and 'developer'
+    
+    send_and_print([
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "What is the capital of France?"}
+        ])
+    
+    send_and_print([
+            {"role": "system", "content": "You are a knowledgeable bot."},
+            {"role": "assistant", "content": "How can I assist you today?"}
+        ])
+    
+    send_and_print([
+            {"role": "system", "content": "You are a knowledgeable bot."}
+        ])
+    
+    send_and_print([
+            {"role": "system", "content": "You are a knowledgeable bot."},
+            {"role": "developer", "content": "This is a tasty burger."}
+        ])

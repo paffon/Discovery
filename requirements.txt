@@ -1,0 +1,7 @@
+# Core dependencies for the Discovery project
+# Main Azure OpenAI and environment dependencies
+openai>=1.0.0
+python-dotenv>=1.0.0
+
+# PocketFlow framework (local package)
+# Note: Install with: pip install -e ./PocketFlow

@@ -1,3 +1,5 @@
 pocketflow/
 .env
 scripts/
+.pyc
+__pycache__/

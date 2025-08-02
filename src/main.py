@@ -2,40 +2,55 @@ from call_llm import call_llm
 import yaml
 from typing import List, Tuple
 
+from pocketflow import Node, Flow
+import prompts
 
-def get_topic() -> str:
-    topic = input("Type a topic (or leave empty for the system to make one up): ")
-    if not topic:
-        while not topic:
+
+def figure_out_who_the_moderator_is_talking_to(moderator_input: str) -> str:
+    """Determine if the moderator is addressing the Israeli or Palestinian negotiators."""
+    
+    class DeciderNode(Node):
+        def prep(self, shared):
+            messages = [{"role": "system", "content": prompts.director_prompt},
+                        {"role": "user", "content": shared["moderator_input"]}]
+            return messages
+        
+        def exec(self, messages: List[dict]) -> str:
+            response = call_llm(messages)
             try:
-                prompt = """Suggest a topic for discussion/debate.
-It needs to be something that one can have different opinions, points of view and perhaps even have feelings about.
-Output ONLY the requested information in YAML format.
-
-**YAML Output Requirements:**
-- The topic (string).
-
-**Example Output:**
-```yaml
-topic: The impact of artificial intelligence on society
-```
-
-Note: In this example, the topic of ""The impact of artificial intelligence on society" is merely an example. You need to be more creative than that.
-
-Generate the YAML output now:
-"""
-                response = call_llm(messages=prompt, temperature=2)
                 yaml_str = response.split("```yaml")[1].split("```")[0].strip()
-                structured_result = yaml.safe_load(yaml_str)
-                assert "topic" in structured_result, "The YAML output must contain a 'topic' key."
-                topic = structured_result["topic"]
-            except (yaml.scanner.ScannerError, AssertionError) as e:
-                print(f"Error processing YAML output: {e}\nTrying again...")
-                continue
-    return topic.strip()
+                yaml_dict = yaml.safe_load(yaml_str)
+                speaker = yaml_dict.get("speaker", "Israeli")  # Default to Israeli if not specified
+                return speaker
+            except Exception as e:
+                return "unclear"
+        
+        def post(self, shared, prep_res, exec_res):
+            shared["speaker"] = exec_res
+            return exec_res
+    
+    decider_node = DeciderNode(max_retries=3, wait=1)
+    decider_node - "unclear" >> decider_node
+    
+    flow = Flow(start=decider_node)
+    shared = {"moderator_input": moderator_input}
+    flow.run(shared)
 
-def main() -> None:
-    objective, teams_names = define_objective_and_teams()
+    next_speaker = shared["speaker"]
 
+    return next_speaker
+
+
+def main() -> None:    
+    while True:
+        moderator_input = input("Moderator (Omri): ")
+        if moderator_input.lower() in ["exit", "quit"]:
+            print("Ending the debate session.")
+            break
+        
+        next_speaker = figure_out_who_the_moderator_is_talking_to(moderator_input)
+        print("Next speaker determined:", next_speaker)
+        pass
+    
 if __name__ == "__main__":
     main()

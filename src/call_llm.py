@@ -26,6 +26,9 @@ def call_llm(messages: Union[str, List[Dict[Literal["system", "user", "assistant
 
     model = "gpt-4.1"
     
+    # print("Calling LLM with messages:")
+    # print(messages)
+
     response = client.chat.completions.create(model=model,
                                               messages=messages,
                                               temperature=temperature,

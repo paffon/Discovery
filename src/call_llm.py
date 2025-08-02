@@ -1,5 +1,5 @@
 from openai import AzureOpenAI
-from typing import Dict, List, Literal
+from typing import Dict, List, Literal, Union
 
 
 def get_from_env(variable_name: str) -> str:
@@ -10,7 +10,11 @@ def get_from_env(variable_name: str) -> str:
     load_dotenv()
     return os.getenv(variable_name)
     
-def call_llm(messages: List[Dict[Literal["system", "user", "assistant"], str]]) -> str:    
+def call_llm(messages: Union[str, List[Dict[Literal["system", "user", "assistant"], str]]], temperature: float = 0.1) -> str:
+    
+    if type(messages) is str:
+        messages = [{"role": "user", "content": messages}]
+        
     api_key = get_from_env("AZURE_API_KEY")
     api_version = get_from_env("AZURE_API_VERSION")
     azure_endpoint = get_from_env("AZURE_API_BASE")
@@ -24,7 +28,7 @@ def call_llm(messages: List[Dict[Literal["system", "user", "assistant"], str]]) 
     
     response = client.chat.completions.create(model=model,
                                               messages=messages,
-                                              temperature=0.1,
+                                              temperature=temperature,
                                               stream=False)
     
     result = response.choices[0].message.content.strip()

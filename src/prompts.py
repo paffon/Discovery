@@ -67,10 +67,20 @@ Your only options are 'Israeli' or 'Palestinian'.
 Output ONLY your decision in YAML format.
 
 **YAML output requirements:**
-- Use a single key `speaker` with the value being either 'Israeli' or 'Palestinian', or 'unclear' if you cannot determine.
+- Use a single key `speaker` with the value: 'Israeli' or 'Palestinian'. If it's unclear, you may specify that the needed speaker is 'unclear'.
 
-**Example format**
+**Example format, when it's clear the next speaker is Israeli**
 ```yaml
 speaker: Israeli
+```
+
+**Example format, when it's clear the next speaker is Palestinian**
+```yaml
+speaker: Palestinian
+```
+
+**Example format, when it's unclear who the next speaker is**
+```yaml
+speaker: unclear
 ```
 """

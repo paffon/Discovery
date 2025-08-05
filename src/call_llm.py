@@ -10,7 +10,11 @@ def get_from_env(variable_name: str) -> str:
     load_dotenv()
     return os.getenv(variable_name)
     
-def call_llm(messages: Union[str, List[Dict[Literal["system", "user", "assistant"], str]]], temperature: float = 0.1) -> str:
+def call_llm(
+    messages: Union[str, List[Dict[Literal["system", "user", "assistant"], str]]],
+    temperature: float = 0.1,
+    model: Literal["gpt-35-turbo", "gpt-4", "gpt-4.1", "gpt-4o", "gpt-o4-mini", "Phi-4-multimodal-instruct"] = "gpt-4"
+) -> str:
     
     if type(messages) is str:
         messages = [{"role": "user", "content": messages}]
@@ -23,8 +27,6 @@ def call_llm(messages: Union[str, List[Dict[Literal["system", "user", "assistant
                          api_version=api_version,
                          azure_endpoint=azure_endpoint,
                          timeout=30.0)
-
-    model = "gpt-4.1"
     
     # print("Calling LLM with messages:")
     # print(messages)

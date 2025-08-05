@@ -62,25 +62,40 @@ The Palestinian team consists of:
 - Ms. Leila Khaled, 45, an experienced lawyer for international affairs, acting as a devil's advocate for Hammed.
 
 You'll hear a question from the moderator and decide who to address it to.
-Your only options are 'Israeli' or 'Palestinian'.
+Your only options are:
+1. 'Unknown input' if the input from the user isn't understood at all, or even in the current context.
+2. 'Unclear' if it's clear the quesiton is directed to someone, but it's Unclear to whom.
+3. 'Israeli' or 'Palestinian'.
+4. 'Both' if the question goes to Both teams.
+5. 'General' if it's just a general declaration to be added to the debate context.
 
 Output ONLY your decision in YAML format.
 
 **YAML output requirements:**
-- Use a single key `speaker` with the value: 'Israeli' or 'Palestinian'. If it's unclear, you may specify that the needed speaker is 'unclear'.
+- Use a single key `speaker` with the value: <Unknown input | Unclear | Israeli | Palestinian | Both | General>
 
-**Example format, when it's clear the next speaker is Israeli**
+**Example format when the user's input doesn't even make sense in cotext**
+```yaml
+speaker: Unknown input
+```
+
+**Example format when it's unclear who the statement/question is directed to**
+```yaml
+speaker: Unclear
+```
+
+**Example format when it's clear that the question is directed to the Israeli team**
 ```yaml
 speaker: Israeli
 ```
 
-**Example format, when it's clear the next speaker is Palestinian**
+**Example format when it's clear that the question is directed to both teams**
 ```yaml
-speaker: Palestinian
+speaker: Both
 ```
 
-**Example format, when it's unclear who the next speaker is**
+**Example format when it's clear that the user's message is just a generic statement**
 ```yaml
-speaker: unclear
+speaker: General
 ```
-"""
+""" # TODO Add confidence level to the YAML output, e.g. `confidence: 0.95` for high confidence, `confidence: 0.5` for low confidence.

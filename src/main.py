@@ -8,12 +8,8 @@ class OpeningNode(Node):
         assert not shared, "OpeningNode should not have any shared state"
         
         general_message = "Debate starting. Israeli and Palestinian negotiators are ready to begin discussions."
-        opening_statement_prompt = """Moderator: Skip formalities and niceties, skip addressing the other team and the moderator.
-Make your opening statement, in one paragraph.
-Then, list 3 topics you'd like to discuss in the debate, in bullet points.
-Be ready for the other to critically address your opening statement and topics."""
         
-        shared["all_outputs"] = [general_message, opening_statement_prompt]
+        shared["all_outputs"] = [general_message, prompts.opening_statement_prompt]
         
         print("\n".join(shared["all_outputs"]) + '\n')
         

@@ -8,7 +8,10 @@ class OpeningNode(Node):
         assert not shared, "OpeningNode should not have any shared state"
         
         general_message = "Debate starting. Israeli and Palestinian negotiators are ready to begin discussions."
-        opening_statement_prompt = "Moderator: Make your opening statement, in one paragraph. Skip formalities and niceties, skip addressing the other team and the moderator, just state your position."
+        opening_statement_prompt = """Moderator: Skip formalities and niceties, skip addressing the other team and the moderator.
+Make your opening statement, in one paragraph.
+Then, list 3 topics you'd like to discuss in the debate, in bullet points.
+Be ready for the other to critically address your opening statement and topics."""
         
         shared["all_outputs"] = [general_message, opening_statement_prompt]
         
@@ -18,17 +21,14 @@ class OpeningNode(Node):
     
     def exec(self, prep_res):
         opening_statements = []
-        hard_coded_opening_statements = {
-            "Israeli": """Israel is committed to achieving a lasting peace that ensures security, prosperity, and mutual respect for both Israelis and Palestinians. Our primary goal is to maintain a secure and recognized state for the Israeli people, including the right to self-defense and control over our borders. We seek a solution that addresses the legitimate aspirations of the Palestinian people while ensuring that any future Palestinian entity is demilitarized and does not pose a threat to Israel. We are prepared to make significant compromises, but not at the expense of our fundamental security needs.""",
-            "Palestinian": """Our primary goal is to achieve a just and lasting peace that ensures the establishment of an independent and sovereign Palestinian state based on the 1967 borders, with East Jerusalem as its capital. We seek the right of return for Palestinian refugees, the release of all Palestinian prisoners, and the cessation of all settlement activities. We are committed to a peaceful resolution that respects the rights and dignity of the Palestinian people and adheres to international law and UN resolutions."""
-            }
+
         for team, sys_prompt in [("Israeli", prompts.simple_israeli_prompt),
                                  ("Palestinian", prompts.simple_palestinian_prompt)]:
-            # opening_statement = call_llm([
-            #     {"role": "system", "content": sys_prompt},
-            #     {"role": "user", "content": "'\n".join(prep_res)}
-            # ])
-            opening_statement = hard_coded_opening_statements[team]
+
+            opening_statement = call_llm([
+                {"role": "system", "content": sys_prompt},
+                {"role": "user", "content": "'\n".join(prep_res)}
+            ])
             opening_statements.append(f"{team} opening statement: {opening_statement}")
             print(f"\n{team} opening statement:\n{opening_statement}")
         
@@ -116,7 +116,9 @@ class ConcludeNode(Node):
         return messages
     
     def exec(self, messages):
-        response = call_llm(messages)
+        response = call_llm(messages,
+                            model="gpt-4.1", # Use a more powerful model for summarization
+                            temperature=0) # Low temperature for consistency
         return response
     
     def post(self, shared, prep_res, exec_res):
